@@ -5,6 +5,7 @@
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <RootNamespace>CSV_Converter</RootNamespace>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Better-Energy.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
