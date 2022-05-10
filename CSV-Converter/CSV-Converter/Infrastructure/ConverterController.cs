@@ -21,9 +21,9 @@ namespace CSV_Converter.Infrastructure
             return (result) ? new CanConvertResponse { Success = true } : new CanConvertResponse { Success = false, Errors = new[] { "Could not peak file" } };
         }
 
-        public ConvertResponse Convert(string filePath)
+        public ConvertResponse Convert(string filePath, int numberOfInverters)
         {
-            return _converter.Convert(filePath);
+            return _converter.Convert(filePath, numberOfInverters);
         }
     }
 }

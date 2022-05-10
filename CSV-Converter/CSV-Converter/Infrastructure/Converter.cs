@@ -24,7 +24,13 @@ namespace CSV_Converter.Infrastructure
             return File.Exists(filePath);
         }
 
-        public ConvertResponse Convert(string filePath)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="targetIterations">The wanted number of cells to iterate through. E.g. if 6, csv files will be produced with 6 lines excluding the header.</param>
+        /// <returns></returns>
+        public ConvertResponse Convert(string filePath, int targetIterations)
         {
             ConvertResponse convertResponse = new ConvertResponse(); // Holding object for the return value of this method
 
@@ -65,7 +71,7 @@ namespace CSV_Converter.Infrastructure
 
                                 cellEntries[iterations] = cellData; // Add the cell data to the backing array
 
-                                if (iterations == 5)
+                                if (iterations == targetIterations - 1)
                                 {
                                     CreateCSVFile(cellEntries); // Create a csv file with the current 6 stored cell entries
                                     numberOfFilesCreated++;

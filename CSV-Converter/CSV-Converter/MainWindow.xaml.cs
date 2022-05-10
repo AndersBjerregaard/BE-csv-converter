@@ -87,20 +87,53 @@ namespace CSV_Converter
                 }
                 else // File peak was succesful
                 {
-                    // Attempt to convert to csv files
-                    Contracts.Responses.ConvertResponse result = _controller.Convert(FilePathTextBox.Text);
-
-                    if (result.Success)
+                    if (!TryParseInvertersTextBox())
                     {
-                        MessageBox.Show($"{result.NumberOfFilesProduced} csv files were produced at the following path: {result.DirectoryPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        MessageBox.Show("Could not recognize input in 'Numbers of inverters' as only numbers", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
                     } else
                     {
-                        string errors = String.Join("\n", result.Errors);
+                        int numberOfInverters = int.Parse(InvertersTextBox.Text);
 
-                        MessageBox.Show($"Oops, something went wrong. Here are the errors:\n{errors}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        // Attempt to convert to csv files
+                        Contracts.Responses.ConvertResponse result = _controller.Convert(FilePathTextBox.Text, numberOfInverters);
+
+                        if (result.Success)
+                        {
+                            MessageBox.Show($"{result.NumberOfFilesProduced} csv files were produced at the following path: {result.DirectoryPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        else
+                        {
+                            string errors = String.Join("\n", result.Errors);
+
+                            MessageBox.Show($"Oops, something went wrong. Here are the errors:\n{errors}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                        }
                     }
                 }
             }
+        }
+
+        private void InvertersTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            bool parsed = int.TryParse(InvertersTextBox.Text, out int numberOfInverters);
+
+            if (!parsed)
+            {
+                InvertersTextBox.Text = 0.ToString();
+                MessageBox.Show("Please only enter numbers", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+            }
+        }
+
+        private bool TryParseInvertersTextBox()
+        {
+            bool parsed = int.TryParse(InvertersTextBox.Text, out int numberOfInverters);
+
+            if (!parsed)
+            {
+                InvertersTextBox.Text = 0.ToString();
+                return false;
+            }
+
+            return true;
         }
     }
 }
