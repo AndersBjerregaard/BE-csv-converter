@@ -10,7 +10,6 @@ namespace CSV_Converter.Infrastructure
 {
     public class Converter
     {
-        private int _fileIterationName = 1; // The placeholding name for the produced CSV files
         private const string _header = "SN,Slave Address,FullName,"; // The header for every CSV file
 
         public string ConverterDirectoryPath { get; private set; }
@@ -48,7 +47,9 @@ namespace CSV_Converter.Infrastructure
                             {
                                 string cellData = excelReader.GetString(9); // Will throw an out of bounds exception if it attempts to read the Device Data spreadsheet
 
+#if DEBUG
                                 System.Diagnostics.Debug.WriteLine(cellData); // Write to debug for testing purposes
+#endif
 
                                 if (cellData.Contains("SN")) // This should return true if it reads the column header
                                 {
@@ -68,7 +69,6 @@ namespace CSV_Converter.Infrastructure
                                 {
                                     CreateCSVFile(cellEntries); // Create a csv file with the current 6 stored cell entries
                                     numberOfFilesCreated++;
-                                    _fileIterationName++;
                                     iterations = 0; // Reset the iteration variable
                                 } else
                                 {
@@ -103,10 +103,10 @@ namespace CSV_Converter.Infrastructure
                 ConverterDirectoryPath = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().GetName().CodeBase);
             }
 
-            // Add a zero in front of the iterator if it's below 10
-            string iteration = (_fileIterationName >= 10) ? _fileIterationName.ToString() : $"0{_fileIterationName}";
+            // Since the name of the file should be that of the device name. We just read the first cell of data, split it. Look at the last bit and cut off the number associated with it.
+            string fileName = data[0].Split(',')[2].Split('_')[0];
 
-            var filePath = $"CSV files\\SL_{iteration}.csv"; // Name and path of the csv file
+            var filePath = $"CSV files\\{fileName}.csv"; // Name and path of the csv file
 
             // Check if a file with the same name exists. If so, override it
             if (File.Exists(filePath))
