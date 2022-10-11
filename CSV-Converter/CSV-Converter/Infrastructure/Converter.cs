@@ -143,7 +143,7 @@ namespace CSV_Converter.Infrastructure
                                 // Check if this is the end of elligible cell data
                                 if (cellData.StartsWith(',') || String.IsNullOrWhiteSpace(cellData))
                                 {
-                                    lastDataSalvaged = true;
+                                    //lastDataSalvaged = true;
                                     var lastBitOfData = new string[iterations];
                                     for (int i = 0; i < iterations; i++)
                                     {
