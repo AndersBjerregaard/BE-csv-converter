@@ -25,5 +25,10 @@ namespace CSV_Converter.Infrastructure
         {
             return _converter.Convert(filePath, numberOfInverters);
         }
+
+        public ConvertResponse Convert(string filePath, int numberOfInverters, int numberOfCss)
+        {
+            return _converter.Convert(filePath, numberOfInverters, numberOfCss);
+        }
     }
 }

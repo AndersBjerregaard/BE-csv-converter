@@ -14,5 +14,7 @@
         <Button x:Name="ConvertButton" Content="Output to CSV Files" HorizontalAlignment="Left" Margin="224,112,0,0" VerticalAlignment="Top" Height="25" Width="150" Click="ConvertButton_Click"/>
         <Label Content="Number of Inverters: " HorizontalAlignment="Left" Margin="117,56,0,0" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.627,0.053"/>
         <TextBox x:Name="InvertersTextBox" HorizontalAlignment="Left" Margin="254,60,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120" TextChanged="InvertersTextBox_TextChanged"/>
+        <Label Content="Number of CSS: " HorizontalAlignment="Left" Margin="117,25,0,0" VerticalAlignment="Top" FontWeight="Bold" RenderTransformOrigin="0.627,0.053"/>
+        <TextBox x:Name="CssTextBox" HorizontalAlignment="Left" Margin="254,29,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="120"/>
     </Grid>
 </Window>

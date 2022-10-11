@@ -90,16 +90,27 @@ namespace CSV_Converter
                     if (!TryParseInvertersTextBox())
                     {
                         MessageBox.Show("Could not recognize input in 'Numbers of inverters' as only numbers", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
-                    } else
+                    } else if (!TryParseInvertersCssBox())
+                    {
+                        MessageBox.Show("Could not recognize input in 'Numbers of css' as only numbers", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+                    }
+                    else
                     {
                         int numberOfInverters = int.Parse(InvertersTextBox.Text);
+                        var cssBoxText = CssTextBox.Text;
+                        int numberOfCss = string.IsNullOrWhiteSpace(cssBoxText) ? 1 : int.Parse(cssBoxText);
 
                         // Attempt to convert to csv files
-                        Contracts.Responses.ConvertResponse result = _controller.Convert(FilePathTextBox.Text, numberOfInverters);
+                        Contracts.Responses.ConvertResponse result = _controller.Convert(FilePathTextBox.Text, numberOfInverters, numberOfCss);
 
                         if (result.Success)
                         {
-                            MessageBox.Show($"{result.NumberOfFilesProduced} csv files were produced at the following path: {result.DirectoryPath}", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                            string messageBoxText = $"{result.NumberOfFilesProduced} csv files were produced at the following path: {result.DirectoryPath}";
+                            //if (!string.IsNullOrEmpty(result.SalvagedData))
+                            //{
+                            //    messageBoxText += "Take note that: " + result.SalvagedData;
+                            //}
+                            MessageBox.Show(messageBoxText, "Success", MessageBoxButton.OK, MessageBoxImage.Information);
                         }
                         else
                         {
@@ -110,6 +121,22 @@ namespace CSV_Converter
                     }
                 }
             }
+        }
+
+        private bool TryParseInvertersCssBox()
+        {
+            if (string.IsNullOrWhiteSpace(CssTextBox.Text))
+                return true;
+
+            bool parsed = int.TryParse(CssTextBox.Text, out int numberOfInverters);
+
+            if (!parsed)
+            {
+                CssTextBox.Text = 0.ToString();
+                return false;
+            }
+
+            return true;
         }
 
         private void InvertersTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -135,5 +162,16 @@ namespace CSV_Converter
 
             return true;
         }
+
+        //private void CssTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        //{
+        //    bool parsed = int.TryParse(CssTextBox.Text, out int numberOfCss);
+
+        //    if (!parsed)
+        //    {
+        //        InvertersTextBox.Text = 0.ToString();
+        //        MessageBox.Show("Please only enter numbers", "Error", MessageBoxButton.OK, MessageBoxImage.Hand);
+        //    }
+        //}
     }
 }

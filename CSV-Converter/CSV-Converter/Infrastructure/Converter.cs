@@ -97,6 +97,97 @@ namespace CSV_Converter.Infrastructure
             }
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="targetIterations">The wanted number of cells to iterate through. E.g. if 6, csv files will be produced with 6 lines excluding the header.</param>
+        /// <param name="wantedRepetitions">The wanted number of devices to include in the same csv file. E.g. if 3, then include 3 devices at a time.</param>
+        /// <returns></returns>
+        public ConvertResponse Convert(string filePath, int targetIterations, int wantedRepetitions)
+        {
+            ConvertResponse convertResponse = new ConvertResponse(); // Holding object for the return value of this method
+
+            using (FileStream stream = File.Open(filePath, FileMode.Open, FileAccess.Read))
+            {
+                // Read from an OpenXml Excel file (2007 format; *.xlsx)
+                using (IExcelDataReader excelReader = ExcelReaderFactory.CreateOpenXmlReader(stream))
+                {
+                    System.Diagnostics.Debug.WriteLine("\nExcel File Output:\n");
+
+                    int boundary = targetIterations * wantedRepetitions;
+
+                    string[] cellEntries = new string[boundary]; // Backing array for storing the device data
+                    int iterations = 0; // Variable storing how many cells of data have been iterated through
+                    int numberOfFilesCreated = 0; // Variable storing how many csv files have been produced
+
+                    //bool lastDataSalvaged = false;
+
+                    do
+                    {
+                        while (excelReader.Read())
+                        {
+                            try
+                            {
+                                string cellData = excelReader.GetString(9); // Will throw an out of bounds exception if it attempts to read the Device Data spreadsheet
+
+#if DEBUG
+                                System.Diagnostics.Debug.WriteLine(cellData); // Write to debug for testing purposes
+#endif
+
+                                if (cellData.Contains("SN")) // This should return true if it reads the column header
+                                {
+                                    continue; // Skip this cell
+                                }
+
+                                // Check if this is the end of elligible cell data
+                                if (cellData.StartsWith(',') || String.IsNullOrWhiteSpace(cellData))
+                                {
+                                    lastDataSalvaged = true;
+                                    var lastBitOfData = new string[iterations];
+                                    for (int i = 0; i < iterations; i++)
+                                    {
+                                        lastBitOfData[i] = cellEntries[i];
+                                    }
+                                    CreateCSVFile(lastBitOfData);
+                                    numberOfFilesCreated++;
+                                    // Finish reading
+                                    break;
+                                }
+
+                                cellEntries[iterations] = cellData; // Add the cell data to the backing array
+
+                                if (iterations == (boundary) - 1)
+                                {
+                                    CreateCSVFile(cellEntries); // Create a csv file with the current 6 stored cell entries
+                                    numberOfFilesCreated++;
+                                    iterations = 0; // Reset the iteration variable
+                                }
+                                else
+                                {
+                                    iterations++;
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                excelReader.NextResult();
+                            }
+                        }
+                    } while (excelReader.NextResult());
+
+                    convertResponse.Success = true;
+                    convertResponse.NumberOfFilesProduced = numberOfFilesCreated;
+                    convertResponse.DirectoryPath = ConverterDirectoryPath;
+                    //if (lastDataSalvaged)
+                    //{
+                    //    convertResponse.SalvagedData = "The last csv file was not produced with the amount of data corresponding to the wanted amount of css";
+                    //}
+                }
+
+                return convertResponse;
+            }
+        }
+
         private void CreateCSVFile(string[] data)
         {
             // If directory storing the csv files does not exist, create it
